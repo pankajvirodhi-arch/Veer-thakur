@@ -18,6 +18,7 @@ label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
 label:first-child{margin-top:0}
 input,textarea{width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
 .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.chip.on{border-color:var(--accent);color:var(--accent);font-weight:600}
 .chip{font:inherit;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
 button.main{width:100%;font:inherit;font-size:17px;font-weight:600;background:var(--accent);color:var(--accent-t);border:0;border-radius:12px;padding:13px;margin-top:4px}
 textarea#out{min-height:300px;resize:vertical;font-size:15px}
@@ -45,6 +46,10 @@ textarea#out{min-height:300px;resize:vertical;font-size:15px}
 <button class="chip" type="button" id="w2">Winner = Team 2</button>
 </div>
 </div>
+<div class="chips" style="margin:0 0 10px">
+<button class="chip" type="button" id="m1">Special font (pakka)</button>
+<button class="chip" type="button" id="m2">Telegram codes</button>
+</div>
 <button class="main" type="button" id="make">Post banao</button>
 <div class="card" style="margin-top:14px">
 <textarea id="out" readonly></textarea>
@@ -56,10 +61,24 @@ textarea#out{min-height:300px;resize:vertical;font-size:15px}
 </main>
 <script>
 var $=function(i){return document.getElementById(i)};
+var mode="font";
+function conv(str,bold){
+  var out="";
+  for(var ch of str){
+    var c=ch.codePointAt(0),r=c;
+    if(c>=65&&c<=90)r=(bold?0x1D63C:0x1D608)+(c-65);
+    else if(c>=97&&c<=122)r=(bold?0x1D656:0x1D622)+(c-97);
+    else if(bold&&c>=48&&c<=57)r=0x1D7EC+(c-48);
+    out+=String.fromCodePoint(r);
+  }
+  return out;
+}
+function setMode(m){mode=m;$("m1").classList.toggle("on",m==="font");$("m2").classList.toggle("on",m==="codes");build();}
 function build(){
   var v=function(i){return $(i).value.trim()};
-  var bi=function(x){return "**__"+x+"__**"};
-  var it=function(x){return "__"+x+"__"};
+  var bi,it;
+  if(mode==="font"){bi=function(x){return conv(x,true)};it=function(x){return conv(x,false)};}
+  else{bi=function(x){return "**__"+x+"__**"};it=function(x){return "__"+x+"__"};}
   var t=[
     bi(v("league")+" 🏏"),"",
     bi("Match no. "+v("match")),"",
@@ -86,10 +105,12 @@ function copyText(){
   $("msg").textContent=done?"Copy ho gaya ✅":"Text select ho gaya, ab long press karke Copy dabao.";
 }
 $("make").onclick=build;
+$("m1").onclick=function(){setMode("font")};
+$("m2").onclick=function(){setMode("codes")};
 $("copy").onclick=copyText;
 $("w1").onclick=function(){$("win").value=$("t1").value;build()};
 $("w2").onclick=function(){$("win").value=$("t2").value;build()};
-build();
+setMode("font");
 </script>
 </body>
 </html>
