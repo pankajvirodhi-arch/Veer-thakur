@@ -46,10 +46,6 @@ textarea#out{min-height:300px;resize:vertical;font-size:15px}
 <button class="chip" type="button" id="w2">Winner = Team 2</button>
 </div>
 </div>
-<div class="chips" style="margin:0 0 10px">
-<button class="chip" type="button" id="m1">Special font (pakka)</button>
-<button class="chip" type="button" id="m2">Telegram codes</button>
-</div>
 <button class="main" type="button" id="make">Post banao</button>
 <div class="card" style="margin-top:14px">
 <textarea id="out" readonly></textarea>
@@ -73,12 +69,10 @@ function conv(str,bold){
   }
   return out;
 }
-function setMode(m){mode=m;$("m1").classList.toggle("on",m==="font");$("m2").classList.toggle("on",m==="codes");build();}
 function build(){
   var v=function(i){return $(i).value.trim()};
-  var bi,it;
-  if(mode==="font"){bi=function(x){return conv(x,true)};it=function(x){return conv(x,false)};}
-  else{bi=function(x){return "**__"+x+"__**"};it=function(x){return "__"+x+"__"};}
+  var bi=function(x){return conv(x,true)};
+  var it=function(x){return conv(x,false)};
   var t=[
     bi(v("league")+" 🏏"),"",
     bi("Match no. "+v("match")),"",
@@ -105,12 +99,10 @@ function copyText(){
   $("msg").textContent=done?"Copy ho gaya ✅":"Text select ho gaya, ab long press karke Copy dabao.";
 }
 $("make").onclick=build;
-$("m1").onclick=function(){setMode("font")};
-$("m2").onclick=function(){setMode("codes")};
 $("copy").onclick=copyText;
 $("w1").onclick=function(){$("win").value=$("t1").value;build()};
 $("w2").onclick=function(){$("win").value=$("t2").value;build()};
-setMode("font");
+build();
 </script>
 </body>
 </html>
