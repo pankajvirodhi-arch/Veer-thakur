@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Match Post Maker</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#14171a;--muted:#6b7280;--line:#d9dde3;--accent:#1d9bf0;--accent-t:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1114;--card:#1a1d22;--text:#eef0f3;--muted:#98a1ad;--line:#2c3138}}
+:root[data-theme="dark"]{--bg:#0f1114;--card:#1a1d22;--text:#eef0f3;--muted:#98a1ad;--line:#2c3138}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+main{max-width:520px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:8px 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+label:first-child{margin-top:0}
+input,textarea{width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.chip{font:inherit;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+button.main{width:100%;font:inherit;font-size:17px;font-weight:600;background:var(--accent);color:var(--accent-t);border:0;border-radius:12px;padding:13px;margin-top:4px}
+textarea#out{min-height:300px;resize:vertical;font-size:15px}
+.row{display:flex;gap:8px;margin-top:10px}
+.row button{flex:1}
+.ok{color:var(--muted);font-size:13px;margin-top:8px;min-height:18px}
+</style>
+</head>
+<body>
+<main>
+<h1>🏏 Match Post Maker</h1>
+<div class="card">
+<label for="league">League name</label>
+<input id="league" value="World Championships Of Legends" autocomplete="off">
+<label for="match">Match number</label>
+<input id="match" value="8th T20" autocomplete="off">
+<label for="t1">Team 1</label>
+<input id="t1" value="England Champions" autocomplete="off">
+<label for="t2">Team 2</label>
+<input id="t2" value="West Indies Champions" autocomplete="off">
+<label for="win">Winner</label>
+<input id="win" value="West Indies Champions" autocomplete="off">
+<div class="chips">
+<button class="chip" type="button" id="w1">Winner = Team 1</button>
+<button class="chip" type="button" id="w2">Winner = Team 2</button>
+</div>
+</div>
+<button class="main" type="button" id="make">Post banao</button>
+<div class="card" style="margin-top:14px">
+<textarea id="out" readonly></textarea>
+<div class="row">
+<button class="main" type="button" id="copy">Copy</button>
+</div>
+<div class="ok" id="msg"></div>
+</div>
+</main>
+<script>
+var $=function(i){return document.getElementById(i)};
+function build(){
+  var v=function(i){return $(i).value.trim()};
+  var bi=function(x){return "**__"+x+"__**"};
+  var it=function(x){return "__"+x+"__"};
+  var t=[
+    bi(v("league")+" 🏏"),"",
+    bi("Match no. "+v("match")),"",
+    bi(v("t1")+" 🆚 "+v("t2")),"",
+    bi("Match Winner =🔻 "+v("win")+" ☑️"),"",
+    it("Mere Entry ka Wait karenge sab..."),"",
+    it("Best Entry dunga with Best Exit ..."),"",
+    it("Under 30p Loss cut book set compulsory"),"",
+    bi("VEER THAKUR OFFICIAL™ 🎲")
+  ].join("\n");
+  $("out").value=t;
+  $("msg").textContent="";
+}
+function copyText(){
+  var o=$("out");
+  if(!o.value)build();
+  o.focus();o.select();o.setSelectionRange(0,99999);
+  var done=false;
+  try{done=document.execCommand("copy")}catch(e){}
+  if(!done&&navigator.clipboard){
+    navigator.clipboard.writeText(o.value).then(function(){$("msg").textContent="Copy ho gaya ✅"},function(){$("msg").textContent="Text select ho gaya, ab long press karke Copy dabao."});
+    return;
+  }
+  $("msg").textContent=done?"Copy ho gaya ✅":"Text select ho gaya, ab long press karke Copy dabao.";
+}
+$("make").onclick=build;
+$("copy").onclick=copyText;
+$("w1").onclick=function(){$("win").value=$("t1").value;build()};
+$("w2").onclick=function(){$("win").value=$("t2").value;build()};
+build();
+</script>
+</body>
+</html>
