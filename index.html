@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Match Post Maker</title>
+<title>Post Maker</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--text:#14171a;--muted:#6b7280;--line:#d9dde3;--accent:#1d9bf0;--accent-t:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#f6f7f9;--card:#fff;--text:#14171a;--muted:#6b7280;--line:#d9dde3;--accent:#1d9bf0;--accent-t:#fff;--danger:#e0443e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1114;--card:#1a1d22;--text:#eef0f3;--muted:#98a1ad;--line:#2c3138}}
 :root[data-theme="dark"]{--bg:#0f1114;--card:#1a1d22;--text:#eef0f3;--muted:#98a1ad;--line:#2c3138}
 *{box-sizing:border-box}
@@ -15,94 +15,307 @@ main{max-width:520px;margin:0 auto;padding:16px}
 h1{font-size:20px;margin:8px 0 14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
 label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
-label:first-child{margin-top:0}
-input,textarea{width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.card>label:first-child{margin-top:0}
+input,textarea,select{width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
 .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-.chip.on{border-color:var(--accent);color:var(--accent);font-weight:600}
 .chip{font:inherit;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
-button.main{width:100%;font:inherit;font-size:17px;font-weight:600;background:var(--accent);color:var(--accent-t);border:0;border-radius:12px;padding:13px;margin-top:4px}
+button.main{width:100%;font:inherit;font-size:17px;font-weight:600;background:var(--accent);color:var(--accent-t);border:0;border-radius:12px;padding:13px}
+button.sec{flex:1;font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+button.del{color:var(--danger)}
+.frow{display:flex;gap:8px}
+button.mic{flex:0 0 48px;font-size:20px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px}
+button.mic.on{background:var(--danger);color:#fff;border-color:var(--danger)}
 textarea#out{min-height:300px;resize:vertical;font-size:15px}
+textarea#bk{min-height:70px;font-size:12px}
 .row{display:flex;gap:8px;margin-top:10px}
-.row button{flex:1}
 .ok{color:var(--muted);font-size:13px;margin-top:8px;min-height:18px}
+summary{font-weight:600;font-size:16px}
+.legend{font-size:13px;color:var(--muted);margin-top:8px}
+.legend code{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:0 4px}
+.lrow{display:flex;gap:6px;margin-top:6px;align-items:center}
+.lrow input{font-size:15px;padding:8px}
+button.sty{flex:0 0 46px;font:inherit;font-size:14px;font-weight:700;background:var(--accent);color:var(--accent-t);border:0;border-radius:8px;padding:9px 0}
+button.mini{flex:0 0 34px;font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 0}
 </style>
 </head>
 <body>
 <main>
-<h1>🏏 Match Post Maker</h1>
+<h1>🏏 Post Maker</h1>
+
 <div class="card">
-<label for="league">League name</label>
-<input id="league" value="World Championships Of Legends" autocomplete="off">
-<label for="match">Match number</label>
-<input id="match" value="8th T20" autocomplete="off">
-<label for="t1">Team 1</label>
-<input id="t1" value="England Champions" autocomplete="off">
-<label for="t2">Team 2</label>
-<input id="t2" value="West Indies Champions" autocomplete="off">
-<label for="win">Winner</label>
-<input id="win" value="West Indies Champions" autocomplete="off">
-<div class="chips">
+<label for="ch">Channel chuno</label>
+<select id="ch"></select>
+<div id="fields"></div>
+<div class="chips" id="wchips" hidden>
 <button class="chip" type="button" id="w1">Winner = Team 1</button>
 <button class="chip" type="button" id="w2">Winner = Team 2</button>
 </div>
+<label for="vlang">Voice ki bhasha (🎤 button ke liye)</label>
+<select id="vlang"><option value="en-IN">English (India)</option><option value="hi-IN">Hindi</option></select>
+<div class="row"><button class="sec" type="button" id="clr">🧹 Entries saaf karo</button></div>
 </div>
+
 <button class="main" type="button" id="make">Post banao</button>
+
 <div class="card" style="margin-top:14px">
 <textarea id="out" readonly></textarea>
-<div class="row">
-<button class="main" type="button" id="copy">Copy</button>
-</div>
+<div class="row"><button class="main" type="button" id="copy">Copy</button></div>
 <div class="ok" id="msg"></div>
 </div>
+
+<details class="card" id="edit">
+<summary>⚙️ Script badlo / naya channel</summary>
+<label for="ename">Channel ka naam</label>
+<input id="ename" autocomplete="off">
+<label>Script ki lines (jo badlo wo apne aap save hota hai)</label>
+<div id="lines"></div>
+<div class="row"><button class="sec" type="button" id="addl">＋ Nayi line</button></div>
+<div class="legend">
+Line ke aage ka neela button dabao to style badlega: <code>BI</code> bold-italic → <code>I</code> italic → <code>B</code> bold → <code>N</code> normal.<br>
+<code>↑</code> line ko upar le jata hai, <code>✕</code> hata deta hai. Khali line = gap.<br>
+Jo cheez har baar badalti hai use <code>{curly}</code> me likho, jaise <code>{league}</code> <code>{team1}</code>. Upar apne aap box ban jayega.
+</div>
+<div class="row"><button class="sec" type="button" id="add">+ Naya channel</button><button class="sec" type="button" id="dup">📄 Copy banao</button></div>
+<div class="row"><button class="sec del" type="button" id="del">Delete</button><button class="sec del" type="button" id="reset">Sab reset</button></div>
+<label for="bk">Backup (dusre phone me le jaane ke liye)</label>
+<textarea id="bk" spellcheck="false" placeholder="Yahan backup code aayega ya paste karo"></textarea>
+<div class="row"><button class="sec" type="button" id="bkget">Backup banao</button><button class="sec" type="button" id="bkset">Backup lagao</button></div>
+<div class="ok" id="emsg"></div>
+</details>
 </main>
+
 <script>
 var $=function(i){return document.getElementById(i)};
-var mode="font";
-function conv(str,bold){
+var KEY="postmaker_v1";
+var STY=["BI","I","B","N"];
+var DEFAULT_TEXT=[
+"BI|{league} 🏏","",
+"BI|Match no. {match}","",
+"BI|{team1} 🆚 {team2}","",
+"BI|Match Winner =🔻 {winner} Will Win This Match ✅","",
+"BI|Mere Entry ka Wait karenge sab...","",
+"BI|Best Entry dunga with Best Exit ...","",
+"BI|Under 30p Loss cut book set compulsory","",
+"BI|VEER THAKUR OFFICIAL™ 🎲"
+].join("\n");
+function defaults(){return {sel:0,lang:"en-IN",channels:[{name:"Veer Thakur",text:DEFAULT_TEXT}]};}
+var data=defaults();
+var vals={};
+var L=[];
+var rec=null;
+
+function load(){
+  try{
+    var r=localStorage.getItem(KEY);
+    if(r){
+      var d=JSON.parse(r);
+      if(d&&d.channels&&d.channels.length){
+        data=d;
+        vals=(d.vals&&typeof d.vals==="object")?d.vals:{};
+        if(!(data.sel>=0&&data.sel<data.channels.length))data.sel=0;
+        if(!data.lang)data.lang="en-IN";
+      }
+    }
+  }catch(e){}
+}
+function persist(){data.vals=vals;try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}}
+
+function conv(str,st){
+  if(st==="N")return str;
+  var bs=st==="BI"?0x1D63C:(st==="B"?0x1D5D4:0x1D608);
+  var ss=st==="BI"?0x1D656:(st==="B"?0x1D5EE:0x1D622);
   var out="";
   for(var ch of str){
     var c=ch.codePointAt(0),r=c;
-    if(c>=65&&c<=90)r=(bold?0x1D63C:0x1D608)+(c-65);
-    else if(c>=97&&c<=122)r=(bold?0x1D656:0x1D622)+(c-97);
-    else if(bold&&c>=48&&c<=57)r=0x1D7EC+(c-48);
+    if(c>=65&&c<=90)r=bs+(c-65);
+    else if(c>=97&&c<=122)r=ss+(c-97);
+    else if((st==="BI"||st==="B")&&c>=48&&c<=57)r=0x1D7EC+(c-48);
     out+=String.fromCodePoint(r);
   }
   return out;
 }
+function fieldsOf(text){
+  var seen=[],re=/\{([A-Za-z0-9_]+)\}/g,m;
+  while((m=re.exec(text))){if(seen.indexOf(m[1])<0)seen.push(m[1]);}
+  return seen;
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+function cur(){return data.channels[data.sel];}
+function titleCase(s){return s.replace(/(^|\s)(\S)/g,function(m,a,b){return a+b.toUpperCase();});}
+
 function build(){
-  var v=function(i){return $(i).value.trim()};
-  var bi=function(x){return conv(x,true)};
-  var it=function(x){return conv(x,false)};
-  var t=[
-    bi(v("league")+" 🏏"),"",
-    bi("Match no. "+v("match")),"",
-    bi(v("t1")+" 🆚 "+v("t2")),"",
-    bi("Match Winner =🔻 "+v("win")+" ☑️"),"",
-    it("Mere Entry ka Wait karenge sab..."),"",
-    it("Best Entry dunga with Best Exit ..."),"",
-    it("Under 30p Loss cut book set compulsory"),"",
-    bi("VEER THAKUR OFFICIAL™ 🎲")
-  ].join("\n");
-  $("out").value=t;
+  var lines=cur().text.split("\n").map(function(l){
+    var m=l.match(/^(BI|B|I|N)\|(.*)$/i),st="N",t=l;
+    if(m){st=m[1].toUpperCase();t=m[2];}
+    t=t.replace(/\{([A-Za-z0-9_]+)\}/g,function(_,k){return (vals[k]||"").trim();});
+    return conv(t,st);
+  });
+  $("out").value=lines.join("\n");
   $("msg").textContent="";
 }
+
+function renderFields(){
+  var names=fieldsOf(cur().text),h="";
+  names.forEach(function(n){
+    h+='<label>'+esc(n.replace(/_/g," "))+'</label><div class="frow"><input data-k="'+esc(n)+'" value="'+esc(vals[n]||"")+'" autocomplete="off"><button type="button" class="mic" data-mic="'+esc(n)+'" aria-label="Voice">🎤</button></div>';
+  });
+  $("fields").innerHTML=h;
+  $("wchips").hidden=!(names.indexOf("team1")>=0&&names.indexOf("team2")>=0&&names.indexOf("winner")>=0);
+}
+function renderSelect(){
+  var h="";
+  data.channels.forEach(function(c,i){h+='<option value="'+i+'"'+(i===data.sel?" selected":"")+'>'+esc(c.name)+'</option>';});
+  $("ch").innerHTML=h;
+}
+
+/* ---------- script editor (line by line) ---------- */
+function parseLines(text){
+  return text.split("\n").map(function(l){
+    var m=l.match(/^(BI|B|I|N)\|(.*)$/i);
+    return m?{s:m[1].toUpperCase(),t:m[2]}:{s:"N",t:l};
+  });
+}
+function drawLines(){
+  var h="";
+  L.forEach(function(x,i){
+    h+='<div class="lrow"><button type="button" class="sty" data-act="sty" data-i="'+i+'">'+x.s+'</button>'+
+       '<input data-act="txt" data-i="'+i+'" value="'+esc(x.t)+'" autocomplete="off">'+
+       '<button type="button" class="mini" data-act="up" data-i="'+i+'">↑</button>'+
+       '<button type="button" class="mini" data-act="rm" data-i="'+i+'">✕</button></div>';
+  });
+  $("lines").innerHTML=h;
+}
+function renderEditor(){
+  $("ename").value=cur().name;
+  L=parseLines(cur().text);
+  drawLines();
+}
+function syncText(){
+  cur().text=L.map(function(x){return x.t===""?"":x.s+"|"+x.t;}).join("\n");
+  persist();renderFields();build();
+}
+$("lines").oninput=function(e){
+  if(e.target.getAttribute("data-act")!=="txt")return;
+  L[parseInt(e.target.getAttribute("data-i"),10)].t=e.target.value;
+  syncText();
+};
+$("lines").onclick=function(e){
+  var b=e.target.closest?e.target.closest("[data-act]"):null;
+  if(!b)return;
+  var a=b.getAttribute("data-act"),i=parseInt(b.getAttribute("data-i"),10);
+  if(a==="sty"){L[i].s=STY[(STY.indexOf(L[i].s)+1)%STY.length];}
+  else if(a==="up"){if(i<1)return;var t=L[i];L[i]=L[i-1];L[i-1]=t;}
+  else if(a==="rm"){L.splice(i,1);}
+  else return;
+  drawLines();syncText();
+};
+$("addl").onclick=function(){L.push({s:"BI",t:""});drawLines();syncText();};
+$("ename").oninput=function(){cur().name=$("ename").value.trim()||"Channel";persist();renderSelect();};
+
+function renderAll(){
+  renderSelect();renderFields();renderEditor();build();
+  $("vlang").value=data.lang||"en-IN";
+}
+
+/* ---------- entries ---------- */
+$("fields").oninput=function(e){
+  var k=e.target.getAttribute("data-k");
+  if(!k)return;
+  vals[k]=e.target.value;persist();build();
+};
+$("fields").onclick=function(e){
+  var b=e.target.closest?e.target.closest("[data-mic]"):null;
+  if(b)startVoice(b.getAttribute("data-mic"),b);
+};
+$("ch").onchange=function(){data.sel=parseInt($("ch").value,10)||0;persist();renderAll();};
+$("vlang").onchange=function(){data.lang=$("vlang").value;persist();};
+function setWinner(from){vals.winner=vals[from]||"";persist();renderFields();build();}
+$("w1").onclick=function(){setWinner("team1")};
+$("w2").onclick=function(){setWinner("team2")};
+$("make").onclick=build;
+$("clr").onclick=function(){vals={};persist();renderFields();build();};
+
+/* ---------- voice ---------- */
+function startVoice(k,btn){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){$("msg").textContent="Is browser me voice nahi chalta. Chrome me kholo, ya keyboard ka mic 🎤 use karo.";return;}
+  if(rec){try{rec.stop();}catch(e){}return;}
+  rec=new SR();
+  rec.lang=data.lang||"en-IN";
+  rec.interimResults=false;
+  rec.maxAlternatives=1;
+  btn.classList.add("on");
+  $("msg").textContent="Bolo... sun raha hoon 🎤";
+  rec.onresult=function(ev){
+    var t=titleCase(ev.results[0][0].transcript.trim());
+    vals[k]=t;persist();
+    var inp=document.querySelector('input[data-k="'+k+'"]');
+    if(inp)inp.value=t;
+    build();
+  };
+  rec.onerror=function(ev){
+    $("msg").textContent=(ev&&ev.error==="not-allowed")?"Mic ki permission do (browser me Allow dabao).":"Voice samajh nahi aaya, dobara try karo.";
+  };
+  rec.onend=function(){btn.classList.remove("on");rec=null;};
+  try{rec.start();}catch(e){rec=null;btn.classList.remove("on");}
+}
+
+/* ---------- copy ---------- */
 function copyText(){
   var o=$("out");
   if(!o.value)build();
   o.focus();o.select();o.setSelectionRange(0,99999);
   var done=false;
-  try{done=document.execCommand("copy")}catch(e){}
+  try{done=document.execCommand("copy");}catch(e){}
   if(!done&&navigator.clipboard){
-    navigator.clipboard.writeText(o.value).then(function(){$("msg").textContent="Copy ho gaya ✅"},function(){$("msg").textContent="Text select ho gaya, ab long press karke Copy dabao."});
+    navigator.clipboard.writeText(o.value).then(function(){$("msg").textContent="Copy ho gaya ✅";},function(){$("msg").textContent="Text select ho gaya, ab long press karke Copy dabao.";});
     return;
   }
   $("msg").textContent=done?"Copy ho gaya ✅":"Text select ho gaya, ab long press karke Copy dabao.";
 }
-$("make").onclick=build;
 $("copy").onclick=copyText;
-$("w1").onclick=function(){$("win").value=$("t1").value;build()};
-$("w2").onclick=function(){$("win").value=$("t2").value;build()};
-build();
+
+/* ---------- channels & backup ---------- */
+function emsg(t){$("emsg").textContent=t;}
+$("add").onclick=function(){
+  data.channels.push({name:"Naya channel",text:"BI|{title}\n\nBI|Yahan apni line likho\n\nBI|MERA NAAM"});
+  data.sel=data.channels.length-1;
+  persist();renderAll();$("edit").open=true;emsg("Naya channel ban gaya. Naam aur lines badlo, apne aap save hoga.");
+};
+$("dup").onclick=function(){
+  data.channels.push({name:cur().name+" (copy)",text:cur().text});
+  data.sel=data.channels.length-1;
+  persist();renderAll();$("edit").open=true;emsg("Copy ban gayi. Naam aur lines badlo, apne aap save hoga.");
+};
+$("del").onclick=function(){
+  if(data.channels.length<2){emsg("Kam se kam ek channel rehna zaruri hai.");return;}
+  if(!confirm("Is channel ko delete karna hai?"))return;
+  data.channels.splice(data.sel,1);data.sel=0;
+  persist();renderAll();emsg("Delete ho gaya.");
+};
+$("reset").onclick=function(){
+  if(!confirm("Saare channel, templates aur entries hatake shuruaat wala template wapas lagana hai?"))return;
+  data=defaults();vals={};persist();renderAll();emsg("Reset ho gaya.");
+};
+$("bkget").onclick=function(){
+  data.vals=vals;
+  var b=$("bk");b.value=JSON.stringify(data);b.focus();b.select();b.setSelectionRange(0,999999);
+  var ok=false;try{ok=document.execCommand("copy");}catch(e){}
+  emsg(ok?"Backup copy ho gaya. Dusre phone me paste karke 'Backup lagao' dabao.":"Backup code select ho gaya, long press karke Copy karo.");
+};
+$("bkset").onclick=function(){
+  try{
+    var d=JSON.parse($("bk").value);
+    if(!d||!d.channels||!d.channels.length)throw new Error("bad");
+    d.channels=d.channels.map(function(c){return {name:String(c.name||"Channel"),text:String(c.text||"")};});
+    d.sel=0;d.lang=d.lang||"en-IN";
+    vals=(d.vals&&typeof d.vals==="object")?d.vals:{};
+    data=d;persist();renderAll();emsg("Backup lag gaya ✅");
+  }catch(e){emsg("Backup code sahi nahi hai. Poora code paste karo.");}
+};
+
+load();
+renderAll();
 </script>
 </body>
 </html>
