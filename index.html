@@ -26,6 +26,8 @@ button.del{color:var(--danger)}
 button.mic{flex:0 0 48px;font-size:20px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px}
 button.mic.on{background:var(--danger);color:#fff;border-color:var(--danger)}
 textarea#out{min-height:300px;resize:vertical;font-size:15px}
+[hidden]{display:none!important}
+#prev{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--bg);font-size:16px;line-height:1.5;min-height:220px;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
 textarea#bk{min-height:70px;font-size:12px}
 .row{display:flex;gap:8px;margin-top:10px}
 .ok{color:var(--muted);font-size:13px;margin-top:8px;min-height:18px}
@@ -58,7 +60,14 @@ button.mini{flex:0 0 34px;font:inherit;font-size:15px;color:var(--text);backgrou
 <button class="main" type="button" id="make">Post banao</button>
 
 <div class="card" style="margin-top:14px">
-<textarea id="out" readonly></textarea>
+<label for="fmt">Copy ka tareeka</label>
+<select id="fmt">
+<option value="rich">Telegram jaisa asli bold-italic (recommended)</option>
+<option value="codes">Telegram codes (** __)</option>
+<option value="font">Special font</option>
+</select>
+<div id="prev" style="margin-top:10px"></div>
+<textarea id="out" readonly style="margin-top:10px" hidden></textarea>
 <div class="row"><button class="main" type="button" id="copy">Copy</button></div>
 <div class="ok" id="msg"></div>
 </div>
@@ -73,7 +82,7 @@ button.mini{flex:0 0 34px;font:inherit;font-size:15px;color:var(--text);backgrou
 <div class="legend">
 Line ke aage ka neela button dabao to style badlega: <code>BI</code> bold-italic → <code>I</code> italic → <code>B</code> bold → <code>N</code> normal.<br>
 <code>↑</code> line ko upar le jata hai, <code>✕</code> hata deta hai. Khali line = gap.<br>
-Jo cheez har baar badalti hai use <code>{curly}</code> me likho, jaise <code>{league}</code> <code>{team1}</code>. Upar apne aap box ban jayega.
+Ek line ke andar kisi box ka style alag karna ho toh <code>{winner:BI}</code> likho (BI, I, B ya N).<br>Jo cheez har baar badalti hai use <code>{curly}</code> me likho, jaise <code>{league}</code> <code>{team1}</code>. Upar apne aap box ban jayega.
 </div>
 <div class="row"><button class="sec" type="button" id="add">+ Naya channel</button><button class="sec" type="button" id="dup">📄 Copy banao</button></div>
 <div class="row"><button class="sec del" type="button" id="del">Delete</button><button class="sec del" type="button" id="reset">Sab reset</button></div>
@@ -88,17 +97,69 @@ Jo cheez har baar badalti hai use <code>{curly}</code> me likho, jaise <code>{le
 var $=function(i){return document.getElementById(i)};
 var KEY="postmaker_v1";
 var STY=["BI","I","B","N"];
-var DEFAULT_TEXT=[
+var BUILTIN=[
+{id:"veer",name:"Veer Thakur",text:[
 "BI|{league} 🏏","",
 "BI|Match no. {match}","",
 "BI|{team1} 🆚 {team2}","",
 "BI|Match Winner =🔻 {winner} Will Win This Match ✅","",
-"BI|Mere Entry ka Wait karenge sab...","",
-"BI|Best Entry dunga with Best Exit ...","",
+"BI|Mere Entry Ka Wait Karenge Sab........","",
+"BI|Best Entry Dunga With Best Exit...","",
 "BI|Under 30p Loss cut book set compulsory","",
-"BI|VEER THAKUR OFFICIAL™ 🎲"
-].join("\n");
-function defaults(){return {sel:0,lang:"en-IN",channels:[{name:"Veer Thakur",text:DEFAULT_TEXT}]};}
+"BI|VEER THAKUR OFFICIAL™ 🎲"].join("\n")},
+{id:"veer_pred",name:"Veer Prediction",text:[
+"BI|{league} 🏆","",
+"BI|Match no. {match}","",
+"BI|{team1} 🆚 {team2}","",
+"BI|Match Winner = {winner} ✅","",
+"BI|{winner} Will Win This Match...","",
+"I|Mere Entry ka Wait karenge sab✔️",
+"I|Best Entry dunga with Best Exit✔️","",
+"I|{winner:BI} under 30p ajaye Loss cut book set compulsory","",
+"BI|VEER THAKUR PREDICTION"].join("\n")},
+{id:"patel",name:"Patel Bhai",text:[
+"BI|{league}🏏","",
+"BI|Match no. {match}","",
+"BI|{team1} 🆚 {team2}","",
+"BI|Match Winner :- {winner} ✅","",
+"BI|Play With Daily Same Limit🎭...","",
+"BI|Mere Call Milne Pe Seedha Entry Karna♨️...","",
+"BI|Loss Cut Book Set Compulsory Under 30p✔️","",
+"BI|Don't Panic Play Safe & Good Luck💲...","",
+"BI|Apka Apna Patel Bhai Pune 🕸️"].join("\n")},
+{id:"sess_call",name:"Session Call",text:[
+"BI|{league} 🏏","",
+"BI|Match no. {match}","",
+"BI|{team1} 🆚 {team2}","",
+"BI|{runs} 👉 ⚡ {over} OVER ⚡","",
+"BI|Note karo sab ✍️","",
+"BI|{limit}% LIMIT SE ⏩","",
+"BI|Apni limit me hi khelo, koi guarantee nahi 🙏","",
+"BI|VEER THAKUR OFFICIAL™ 🎲"].join("\n")},
+{id:"sess_upd",name:"Session Update",text:[
+"BI|{league} 🏏","",
+"BI|Match no. {match}","",
+"BI|{team1} 🆚 {team2}","",
+"BI|{over} Over Session: {runs} 👉 {result}","",
+"BI|Aage ka wait karo sab...","",
+"BI|VEER THAKUR OFFICIAL™ 🎲"].join("\n")},
+{id:"entry_exit",name:"Entry + Exit",text:[
+"BI|{league} 🏏","",
+"BI|{team1} 🆚 {team2}","",
+"BI|Entry: {entry}","",
+"BI|Exit: {exit}","",
+"BI|Under {loss}p Loss cut book set compulsory","",
+"BI|VEER THAKUR OFFICIAL™ 🎲"].join("\n")}
+];
+function defaults(){return {sel:0,lang:"en-IN",mode:"rich",removed:[],channels:BUILTIN.map(function(c){return {id:c.id,name:c.name,text:c.text};})};}
+function mergeBuiltin(){
+  var rem=data.removed||[];
+  data.channels.forEach(function(c){BUILTIN.forEach(function(b){if(!c.id&&c.name===b.name)c.id=b.id;});});
+  BUILTIN.forEach(function(b){
+    var has=data.channels.some(function(c){return c.id===b.id||c.name===b.name;});
+    if(!has&&rem.indexOf(b.id)<0)data.channels.push({id:b.id,name:b.name,text:b.text});
+  });
+}
 var data=defaults();
 var vals={};
 var L=[];
@@ -114,6 +175,9 @@ function load(){
         vals=(d.vals&&typeof d.vals==="object")?d.vals:{};
         if(!(data.sel>=0&&data.sel<data.channels.length))data.sel=0;
         if(!data.lang)data.lang="en-IN";
+        if(!data.mode)data.mode="rich";
+        if(!data.removed)data.removed=[];
+        mergeBuiltin();
       }
     }
   }catch(e){}
@@ -135,7 +199,7 @@ function conv(str,st){
   return out;
 }
 function fieldsOf(text){
-  var seen=[],re=/\{([A-Za-z0-9_]+)\}/g,m;
+  var seen=[],re=/\{([A-Za-z0-9_]+)(?::(?:BI|B|I|N))?\}/gi,m;
   while((m=re.exec(text))){if(seen.indexOf(m[1])<0)seen.push(m[1]);}
   return seen;
 }
@@ -143,14 +207,52 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").re
 function cur(){return data.channels[data.sel];}
 function titleCase(s){return s.replace(/(^|\s)(\S)/g,function(m,a,b){return a+b.toUpperCase();});}
 
-function build(){
-  var lines=cur().text.split("\n").map(function(l){
+var richHtml="",richPlain="";
+function escH(x){return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function lineParts(){
+  return cur().text.split("\n").map(function(l){
     var m=l.match(/^(BI|B|I|N)\|(.*)$/i),st="N",t=l;
     if(m){st=m[1].toUpperCase();t=m[2];}
-    t=t.replace(/\{([A-Za-z0-9_]+)\}/g,function(_,k){return (vals[k]||"").trim();});
-    return conv(t,st);
+    var segs=[],last=0,mm,re=/\{([A-Za-z0-9_]+)(?::(BI|B|I|N))?\}/gi;
+    while((mm=re.exec(t))){
+      if(mm.index>last)segs.push({t:t.slice(last,mm.index),s:st});
+      segs.push({t:(vals[mm[1]]||"").trim(),s:mm[2]?mm[2].toUpperCase():st});
+      last=re.lastIndex;
+    }
+    if(last<t.length)segs.push({t:t.slice(last),s:st});
+    var out=[];
+    segs.forEach(function(g){var p=out[out.length-1];if(p&&p.s===g.s)p.t+=g.t;else out.push({t:g.t,s:g.s});});
+    return out;
   });
-  $("out").value=lines.join("\n");
+}
+function segsText(segs){return segs.map(function(g){return g.t;}).join("");}
+function segHtml(g){
+  if(g.t==="")return "";
+  var e=escH(g.t);
+  if(g.s==="BI")return "<b><i>"+e+"</i></b>";
+  if(g.s==="B")return "<b>"+e+"</b>";
+  if(g.s==="I")return "<i>"+e+"</i>";
+  return e;
+}
+function segCodes(g){
+  if(g.t==="")return "";
+  if(g.s==="BI")return "**__"+g.t+"__**";
+  if(g.s==="B")return "**"+g.t+"**";
+  if(g.s==="I")return "__"+g.t+"__";
+  return g.t;
+}
+function build(){
+  var parts=lineParts(),mode=data.mode||"rich";
+  if(mode==="rich"){
+    richHtml=parts.map(function(segs){return segs.map(segHtml).join("");}).join("<br>");
+    richPlain=parts.map(segsText).join("\n");
+    $("prev").innerHTML=richHtml;
+    $("prev").hidden=false;$("out").hidden=true;
+  }else{
+    var f=mode==="codes"?segCodes:function(g){return conv(g.t,g.s);};
+    $("out").value=parts.map(function(segs){return segs.map(f).join("");}).join("\n");
+    $("out").hidden=false;$("prev").hidden=true;
+  }
   $("msg").textContent="";
 }
 
@@ -215,6 +317,7 @@ $("ename").oninput=function(){cur().name=$("ename").value.trim()||"Channel";pers
 function renderAll(){
   renderSelect();renderFields();renderEditor();build();
   $("vlang").value=data.lang||"en-IN";
+  $("fmt").value=data.mode||"rich";
 }
 
 /* ---------- entries ---------- */
@@ -273,7 +376,23 @@ function copyText(){
   }
   $("msg").textContent=done?"Copy ho gaya ✅":"Text select ho gaya, ab long press karke Copy dabao.";
 }
-$("copy").onclick=copyText;
+function richCopy(){
+  var p=$("prev"),sel=window.getSelection?window.getSelection():null;
+  if(sel){var r=document.createRange();r.selectNodeContents(p);sel.removeAllRanges();sel.addRange(r);}
+  var done=false;
+  var h=function(e){e.clipboardData.setData("text/html",richHtml);e.clipboardData.setData("text/plain",richPlain);e.preventDefault();};
+  document.addEventListener("copy",h);
+  try{done=document.execCommand("copy");}catch(e){}
+  document.removeEventListener("copy",h);
+  if(sel)sel.removeAllRanges();
+  if(!done&&navigator.clipboard&&window.ClipboardItem){
+    navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([richHtml],{type:"text/html"}),"text/plain":new Blob([richPlain],{type:"text/plain"})})]).then(function(){$("msg").textContent="Copy ho gaya ✅ (bold-italic ke saath)";},function(){$("msg").textContent="Copy nahi hua. Neeche 'Copy ka tareeka' badal ke dekho.";});
+    return;
+  }
+  $("msg").textContent=done?"Copy ho gaya ✅ (bold-italic ke saath)":"Copy nahi hua. 'Copy ka tareeka' badal ke dekho.";
+}
+$("copy").onclick=function(){if((data.mode||"rich")==="rich")richCopy();else copyText();};
+$("fmt").onchange=function(){data.mode=$("fmt").value;persist();build();};
 
 /* ---------- channels & backup ---------- */
 function emsg(t){$("emsg").textContent=t;}
@@ -290,6 +409,7 @@ $("dup").onclick=function(){
 $("del").onclick=function(){
   if(data.channels.length<2){emsg("Kam se kam ek channel rehna zaruri hai.");return;}
   if(!confirm("Is channel ko delete karna hai?"))return;
+  var dc=cur();if(dc.id){data.removed=data.removed||[];if(data.removed.indexOf(dc.id)<0)data.removed.push(dc.id);}
   data.channels.splice(data.sel,1);data.sel=0;
   persist();renderAll();emsg("Delete ho gaya.");
 };
@@ -307,8 +427,8 @@ $("bkset").onclick=function(){
   try{
     var d=JSON.parse($("bk").value);
     if(!d||!d.channels||!d.channels.length)throw new Error("bad");
-    d.channels=d.channels.map(function(c){return {name:String(c.name||"Channel"),text:String(c.text||"")};});
-    d.sel=0;d.lang=d.lang||"en-IN";
+    d.channels=d.channels.map(function(c){return {id:c.id,name:String(c.name||"Channel"),text:String(c.text||"")};});
+    d.sel=0;d.lang=d.lang||"en-IN";d.mode=d.mode||"rich";d.removed=d.removed||[];
     vals=(d.vals&&typeof d.vals==="object")?d.vals:{};
     data=d;persist();renderAll();emsg("Backup lag gaya ✅");
   }catch(e){emsg("Backup code sahi nahi hai. Poora code paste karo.");}
